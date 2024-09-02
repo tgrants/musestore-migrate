@@ -1,0 +1,34 @@
+{
+	"id": [
+		{"en": "ID"},
+		{"lv": "NPK"}
+	],
+	"name": [
+		{"en": "Name"},
+		{"lv": "Nosaukums"}
+	],
+	"composer": [
+		{"en": "Composer"},
+		{"lv": "Komponists"}
+	],
+	"instrument": [
+		{"en": "Instrument"},
+		{"lv": "Instruments"}
+	],
+	"grade": [
+		{"en": "Grade"},
+		{"lv": "Klase"}
+	],
+	"scale": [
+		{"en": "Scale"},
+		{"lv": "Tonalitāte"}
+	],
+	"type": [
+		{"en": "Type"},
+		{"lv": "Veids"}
+	],
+	"file": [
+		{"en": "File"},
+		{"lv": "Fails"}
+	]
+}
