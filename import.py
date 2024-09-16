@@ -58,6 +58,11 @@ def main():
 	print("Dropping duplicate IDs")
 	df = df.drop_duplicates(subset='ID', keep='first')
 
+	# Ensure all columns are strings
+	print("Converting columns to strings")
+	for col in df.columns:
+		df[col] = df[col].apply(lambda x: str(int(x)) if isinstance(x, float) and x.is_integer() else str(x))
+
 	# Create types
 	print("Generating types")
 	for t in df.Type.unique():
@@ -81,11 +86,27 @@ def main():
 
 	# Bind pieces and tags
 	print("Binding pieces and tags")
-	for row in df.iterrows():
-		pass
+	df_tags = df
+	df_tags['Composer'] = df_tags['Composer'].str.split('/')
+	df_tags['Instrument'] = df_tags['Instrument'].str.split('/')
+	df_tags['Grade'] = df_tags['Grade'].str.split('/')
+	df_tags['Scale'] = df_tags['Scale'].str.split('/')
+	df_tags = df_tags.groupby("Name").agg({
+		'Composer': lambda x: [item for sublist in x for item in sublist],
+		'Instrument': lambda x: [item for sublist in x for item in sublist],
+		'Grade': lambda x: [item for sublist in x for item in sublist],
+		'Scale': lambda x: [item for sublist in x for item in sublist]
+	}).reset_index()
+	for index, row in df_tags.iterrows():
+		row_tags = list(set(row.Composer + row.Instrument + row.Grade + row.Scale))
+		for tag in row_tags:
+			out_file.write(f"INSERT INTO piece_tag (piece_id, tag_id) VALUES ((SELECT id FROM pieces WHERE name = '{row.Name}'), (SELECT id FROM tags WHERE name = '{tag}'));\n")
 
 	# Create items
 	print("Generating items")
+	for index, row in df.iterrows():
+		# Process files
+		pass
 
 
 if __name__ == '__main__':

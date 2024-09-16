@@ -8,7 +8,7 @@ Compatible with musestore `v0.1.0`.
 >
 > * Make sure the tables have been created beforehand.
 > * Always create a backup of your database before running the insert statements.
-> * There are no checks for SQL injections. Only use trusted input files.
+> * There are no checks for SQL injections. Only use trusted input files. Check output before running it.
 
 ## Input format
 
