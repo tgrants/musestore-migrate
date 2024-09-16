@@ -28,7 +28,14 @@ def main():
 
 	df = pd.read_csv(args.file)
 
-	fout = open(f"{os.path.join("output", f"out_{int(time.time())}.sql")}", "w") # output file
+	# Create output directory
+	out_dir = os.path.join("output", f"out_{int(time.time())}")
+	os.makedirs(out_dir)
+	# Create sql file
+	out_file = open(f"{os.path.join(out_dir, "insert.sql")}", "w")
+	# Create uploads directory
+	out_uploads = os.path.join(out_dir, "uploads")
+	os.makedirs(out_uploads)
 
 	# Rename the columns to english
 	print("Checking column names")
@@ -54,7 +61,7 @@ def main():
 	# Create types
 	print("Generating types")
 	for t in df.Type.unique():
-		fout.write(nanoorm.insert("types", type=t) + "\n")
+		out_file.write(nanoorm.insert("types", type=t) + "\n")
 
 	# Create tags
 	print("Generating tags")
@@ -64,11 +71,21 @@ def main():
 	df_scale = df.Scale.dropna().str.strip().str.split('/').explode().unique().tolist()
 	tags = df_composer + df_instrument + df_grade + df_scale
 	for t in tags:
-		fout.write(nanoorm.insert("tags", type=t) + "\n")
+		out_file.write(nanoorm.insert("tags", type=t) + "\n")
 
-	# Create pieces and items
-	print("Generating pieces and items")
-	pass
+	# Create pieces
+	print("Generating pieces")
+	df_piece = df.Name.dropna().unique().tolist()
+	for p in df_piece:
+		out_file.write(nanoorm.insert("pieces", name=p) + "\n")
+
+	# Bind pieces and tags
+	print("Binding pieces and tags")
+	for row in df.iterrows():
+		pass
+
+	# Create items
+	print("Generating items")
 
 
 if __name__ == '__main__':

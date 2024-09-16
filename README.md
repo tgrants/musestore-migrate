@@ -4,7 +4,7 @@ Scripts for migrating a `.csv` file to the musestore database by generating inse
 
 Compatible with musestore `v0.1.0`.
 
-> **Important**
+> [!IMPORTANT]
 >
 > * Make sure the tables have been created beforehand.
 > * Always create a backup of your database before running the insert statements.
