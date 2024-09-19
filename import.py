@@ -2,7 +2,7 @@ import json
 import nanoorm
 import os
 import pandas as pd
-import sqlite3
+import shutil
 import time
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
@@ -21,6 +21,16 @@ def main():
 		help = "Display version information and dependencies.",
 	)
 	parser.add_argument(
+		"--convert-path",
+		action="store_true",
+		help = "Change all backward slashes to forward slashes in filepaths.",
+	)
+	parser.add_argument(
+		"--skip-file-processing",
+		action="store_true",
+		help = "Do not process files listed in the csv file.",
+	)
+	parser.add_argument(
 		"file",
 		help = "Path to input file."
 	)
@@ -28,11 +38,13 @@ def main():
 
 	df = pd.read_csv(args.file)
 
+	# Set input directory
+	in_dir = os.path.dirname(args.file)
 	# Create output directory
 	out_dir = os.path.join("output", f"out_{int(time.time())}")
 	os.makedirs(out_dir)
 	# Create sql file
-	out_file = open(f"{os.path.join(out_dir, "insert.sql")}", "w")
+	out_file = open(os.path.join(out_dir, "insert.sql"), "w")
 	# Create uploads directory
 	out_uploads = os.path.join(out_dir, "uploads")
 	os.makedirs(out_uploads)
@@ -105,8 +117,21 @@ def main():
 	# Create items
 	print("Generating items")
 	for index, row in df.iterrows():
-		# Process files
-		pass
+		fp = row.File
+		if (args.convert_path):
+			fp = fp.replace("\\", "/")
+		fp_basename = os.path.basename(fp)
+		copy_src = os.path.join(in_dir, fp)
+		copy_dst = os.path.join(out_dir, "uploads", fp_basename)
+		# Copy and process files
+		if (fp != "nan"):
+			print(fp)
+			if os.path.exists(copy_src):
+				if not args.skip_file_processing:
+					shutil.copy(copy_src, copy_dst)
+			else:
+				print("Path does not exist")
+		out_file.write(f"INSERT INTO items (name, filepath, type_id, piece_id) VALUES ('{fp_basename}', '{os.path.join("uploads", fp_basename)}', 1, 1);\n")
 
 
 if __name__ == '__main__':

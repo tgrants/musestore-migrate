@@ -10,6 +10,13 @@ Compatible with musestore `v0.1.0`.
 > * Always create a backup of your database before running the insert statements.
 > * There are no checks for SQL injections. Only use trusted input files. Check output before running it.
 
+## Options
+
+Flag | Action
+--- | ---
+`--convert-path` | Change all backward slashes to forward slashes in filepaths.
+`--skip-file-processing` | Do not process files listed in the csv file. Useful when debugging.
+
 ## Input format
 
 ### Columns
@@ -31,7 +38,6 @@ ID | Name | Composer | Instrument | Grade | Scale | Type | File
 1 | Tico-Tico no Fubá | Abreu Zequinha | flute | 6 | d-moll | Partiture | Abreu Zequinha\Abreu_Tico_tico_Flute.pdf
 2 | Tico-Tico no Fubá | Abreu Zequinha | flute/piano | 6 | d-moll | Partiture | Abreu Zequinha\Abreu_Tico_tico_complete.pdf
 3 | Le Basque | Marin Marais | flute | 5 | F-dur | Partiture | Marais Marin\Marais_Le Basque_flute.pdf
-
 
 ## Instructions
 
