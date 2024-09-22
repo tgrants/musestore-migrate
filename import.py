@@ -78,7 +78,7 @@ def main():
 	# Create types
 	print("Generating types")
 	for t in df.Type.unique():
-		out_file.write(nanoorm.insert("types", type=t) + "\n")
+		out_file.write(nanoorm.insert("types", name=t) + "\n")
 
 	# Create tags
 	print("Generating tags")
@@ -88,7 +88,7 @@ def main():
 	df_scale = df.Scale.dropna().str.strip().str.split('/').explode().unique().tolist()
 	tags = df_composer + df_instrument + df_grade + df_scale
 	for t in tags:
-		out_file.write(nanoorm.insert("tags", type=t) + "\n")
+		out_file.write(nanoorm.insert("tags", name=t) + "\n")
 
 	# Create pieces
 	print("Generating pieces")
@@ -112,26 +112,26 @@ def main():
 	for index, row in df_tags.iterrows():
 		row_tags = list(set(row.Composer + row.Instrument + row.Grade + row.Scale))
 		for tag in row_tags:
+			tag = tag.strip()
 			out_file.write(f"INSERT INTO piece_tag (piece_id, tag_id) VALUES ((SELECT id FROM pieces WHERE name = '{row.Name}'), (SELECT id FROM tags WHERE name = '{tag}'));\n")
 
 	# Create items
 	print("Generating items")
 	for index, row in df.iterrows():
 		fp = row.File
+		if (fp == "nan"):
+			continue
 		if (args.convert_path):
 			fp = fp.replace("\\", "/")
 		fp_basename = os.path.basename(fp)
 		copy_src = os.path.join(in_dir, fp)
 		copy_dst = os.path.join(out_dir, "uploads", fp_basename)
-		# Copy and process files
-		if (fp != "nan"):
-			print(fp)
-			if os.path.exists(copy_src):
-				if not args.skip_file_processing:
-					shutil.copy(copy_src, copy_dst)
-			else:
-				print("Path does not exist")
-		out_file.write(f"INSERT INTO items (name, filepath, type_id, piece_id) VALUES ('{fp_basename}', '{os.path.join("uploads", fp_basename)}', 1, 1);\n")
+		if os.path.exists(copy_src):
+			if not args.skip_file_processing:
+				shutil.copy(copy_src, copy_dst)
+		else:
+			print(f"Path does not exist: {copy_src}")
+		out_file.write(f"INSERT INTO items (name, filepath, type_id, piece_id) VALUES ('{fp_basename.replace("'", "''")}', '{os.path.join("uploads", fp_basename.replace("'", "''"))}', (SELECT id FROM types WHERE name = '{row.Type}'), (SELECT id FROM pieces WHERE name = '{row.Name}'));\n")
 
 
 if __name__ == '__main__':
